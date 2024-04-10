@@ -1,0 +1,176 @@
+# Businesses
+	Request: POST /businesses - create a business
+		Request body:
+			{
+				"name": string,
+			    "streetAddress": string,
+			    "city": string,
+			    "state": string,
+			    "zipCode": number,
+			    "phoneNumber": string,
+			    "category": string,
+			    "subcategories": [string],
+			    "website": string (optional),
+			    "email": string (optional)
+			}
+		Response body:
+			{
+				"businessId": string,
+				"businessHref": /businesses/{id}
+			}
+
+
+	Request: PUT /businesses/{businessId} - update a business
+		Request body:
+			{
+				"name": string, 
+			    "streetAddress": string,
+			    "city": string,
+			    "state": string,
+			    "zipCode": number,
+			    "phoneNumber": string,
+			    "category": string,
+			    "subcategories": [string],
+			    "website": string (optional),
+			    "email": string (optional)
+			}
+		Response body:
+			{
+				"businessId": string,
+				"businessHref": /businesses/{id}
+			}
+
+	Request: DELETE /businesses/{id} - delete a business
+		Request body: -
+		Response body: -
+
+	Request: GET /businesses - list all businesses
+		Request body: -
+		Response body:
+			[
+				{
+					"businessId": string,
+					"businessHref": /businesses/{id},
+					"name": string,
+				    "streetAddress": string,
+				    "city": string,
+				    "state": string,
+				    "zipCode": number,
+				    "phoneNumber": string,
+				    "category": string,
+				    "subcategories": [list of strings],
+				    "website": string (optional),
+				    "email": string (optional)
+				}, ...
+			]
+	
+	Request: GET /businesses/{id} - list a specific business's details
+		Request body: -
+		Response body:
+			{
+				"businessId": string,
+				"businessHref": /businesses/{id},
+				"name": string,
+				"streetAddress": string,
+				"city": string,
+				"state": string,
+				"zipCode": number,
+				"phoneNumber": string,
+				"category": string,
+				"subcategories": [list of strings],
+				"website": string (optional),
+				"email": string (optional)
+				"reviews": [
+					{
+						"reviewId": string,
+						"stars": number,
+						"expense": number,
+						"review": string (optional)
+					}, ...
+				],
+				"photos": [list of strings containing hrefs],
+			}
+
+# Reviews
+	Request: POST /reviews - create a review of a business
+		Request body:
+			{
+				"businessId": string,
+				"stars": number,
+				"expense": number,
+				"review": string (optional)
+			}
+		Response body: 
+			{
+				"reviewId": string
+			}
+
+	Request: PUT /reviews/{reviewId} - update a review of a business
+		Request body:
+			{
+				"stars": number,
+				"expense": number,
+				"review": string (optional)
+			}
+		Response body: 
+			{
+				"reviewId": string
+			}
+
+	Request: GET /reviews - list all of a user's reviews
+		Request body: -
+		Response body:
+			[
+				{
+					"reviewId": string,
+					"stars": number,
+					"expense": number,
+					"review": string (optional)
+				}, ...
+			]
+
+	Request: POST /photos - add a photo of a business
+		// Source for this endpoint: https://stackoverflow.com/a/37394437/7100879
+		// I'm not sure how this will work with parsing this request in Express
+		Content-Type: multipart/related; boundary=<boundaryIdentifier>
+		Request body:
+			--<boundaryIdentifier>
+			Content-Type: application/json
+			{
+				"businessId": string,
+				"caption": string (optional)
+			}
+
+			--<boundaryIdentifier>
+			Content-Type: image/jpeg
+			[image data]
+		Response body:
+			{
+				"photoId": string
+			}
+
+	Request: DELETE /photos/{photoId} - delete a photo
+		Request body: -
+		Response body: -
+
+	Request: PUT /photos/{photoId} - update a photo caption
+		Request body:
+			{
+				"caption": string (optional)
+			}
+		Response body:
+			{
+				"photoId": string,
+			}
+
+	Request: GET /photos - retrieve photos a user has uploaded
+		Request body: -
+		Response body:
+			{
+				"photos": [list of strings containing hrefs to photos],
+			}
+		
+
+
+
+
