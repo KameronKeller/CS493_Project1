@@ -6,21 +6,29 @@ status() {
     printf -- "-----------------------------------------------------\n"
 }
 
-# This is a comment
-# This is where I'm testing the businesses endpoint
+# businesses endpoint
+status 'POST businesses should create a business'
+curl -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"name": "test business", "streetAddress": "123 Address St", "city": "Nowhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
+    http://localhost:8086/businesses
 
-status 'GET business-by-id should return success'
-curl http://localhost:3000/businesses/2
+status 'POST businesses should not create a business if necessary fields are missing'
+curl -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"streetAddress": "123 Address St", "city": "Nowhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
+    http://localhost:8086/businesses
 
-status 'GET business-by-id should return failure'
-curl http://localhost:3000/businesses/9999
+
+# status 'GET business-by-id should return failure'
+# curl http://localhost:3000/businesses/9999
 
 # Here's an example of splitting a big command across
 # multiple lines by ending the line with "\":
 
-curl -v -X PUT \
-    -H 'Content-Type: application/json' \
-    -d '{"starRating": "1", "dollarRaing": "1", "review": "Do not wish to return"}' \
-    http://localhost:3000/reviews/2
+# curl -v -X PUT \
+#     -H 'Content-Type: application/json' \
+#     -d '{"starRating": "1", "dollarRaing": "1", "review": "Do not wish to return"}' \
+#     http://localhost:3000/reviews/2
 
 # etc.

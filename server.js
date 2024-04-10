@@ -6,18 +6,40 @@ app.use(express.json());
 // TODO: set this up so that it uses the port environment variable
 var port = 8086;
 
+let businesses = []
+
+
 function on_ready() {
     console.log("server ready!");
-}
+} 
 
-// option 2
 app.listen(port, () => {
     on_ready() 
 });
 
 // Request: POST /businesses - create a business
-app.post("", (req, res, next) => {
-    res.send()
+app.post("/businesses", (req, res) => {
+    if (
+        req.body.name &&
+        req.body.streetAddress &&
+        req.body.city &&
+        req.body.state &&
+        req.body.zipCode &&
+        req.body.phoneNumber &&
+        req.body.category &&
+        req.body.subcategories
+    ) {
+        const index = businesses.length
+        businesses.push(req.body)
+        res.send({
+            "businessId": index,
+            "businessHref": `/businesses/${index}`
+        })
+    } else {
+        res.status(400).send(
+            "Error 400: Missing necessary fields"
+        )
+    }
 })
 
 // Request: PUT /businesses/{businessId} - update a business
@@ -26,6 +48,10 @@ app.put("", (req, res, next) => {
 })
 
 // Request: DELETE /businesses/{id} - delete a business
+app.delete("", (req, res, next) => {
+    res.send()
+})
+
 // Request: GET /businesses - list all businesses
 app.get("", (req, res, next) => {
     res.send()
@@ -71,6 +97,12 @@ app.get("", (req, res, next) => {
     res.send()
 })
 
+
+app.use('*', function (req, res) {
+    res.status(404).send({
+        err: "The requested resource doesn't exist"
+    });
+});
 
 
 /*************************************/
