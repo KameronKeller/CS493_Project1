@@ -19,6 +19,12 @@ curl -X POST \
     -d '{"streetAddress": "123 Address St", "city": "Nowhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
     http://localhost:8086/businesses
 
+status 'PUT businesses should update a business by ID'
+curl -v -X PUT \
+    -H 'Content-Type: application/json' \
+    -d '{"name": "New Business Name", "streetAddress": "123 Address St", "city": "Somewhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
+    http://localhost:8086/businesses/0
+
 
 # status 'GET business-by-id should return failure'
 # curl http://localhost:3000/businesses/9999

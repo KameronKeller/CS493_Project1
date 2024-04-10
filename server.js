@@ -43,8 +43,32 @@ app.post("/businesses", (req, res) => {
 })
 
 // Request: PUT /businesses/{businessId} - update a business
-app.put("", (req, res, next) => {
-    res.send()
+app.put("/businesses/:businessId", (req, res, next) => {
+    const businessId = req.params.businessId
+    if (businessId > businesses.length || businessId < 0) {
+        res.status(400).send(
+            "Error 400: Specified resource does not exist"
+        )
+    } else if (
+        req.body.name &&
+        req.body.streetAddress &&
+        req.body.city &&
+        req.body.state &&
+        req.body.zipCode &&
+        req.body.phoneNumber &&
+        req.body.category &&
+        req.body.subcategories
+    ) {
+        businesses[businessId] = req.body
+        res.send({
+            "businessId": businessId,
+            "businessHref": `/businesses/${businessId}`
+        })
+    } else {
+        res.status(400).send(
+            "Error 400: Missing necessary fields"
+        )
+    }
 })
 
 // Request: DELETE /businesses/{id} - delete a business
