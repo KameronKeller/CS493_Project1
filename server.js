@@ -43,7 +43,7 @@ app.post("/businesses", (req, res) => {
 })
 
 // Request: PUT /businesses/{businessId} - update a business
-app.put("/businesses/:businessId", (req, res, next) => {
+app.put("/businesses/:businessId", (req, res) => {
     const businessId = req.params.businessId
     if (businessId > businesses.length || businessId < 0) {
         res.status(400).send(
@@ -72,8 +72,16 @@ app.put("/businesses/:businessId", (req, res, next) => {
 })
 
 // Request: DELETE /businesses/{id} - delete a business
-app.delete("", (req, res, next) => {
-    res.send()
+app.delete("/businesses/:businessId", (req, res) => {
+    const businessId = req.params.businessId
+    if (businessId > businesses.length || businessId < 0) {
+        res.status(400).send(
+            "Error 400: Specified resource does not exist"
+        )
+    } else {
+        businesses.splice(businessId, 1)
+        res.sendStatus(200);
+    }
 })
 
 // Request: GET /businesses - list all businesses

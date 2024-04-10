@@ -25,6 +25,13 @@ curl -v -X PUT \
     -d '{"name": "New Business Name", "streetAddress": "123 Address St", "city": "Somewhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
     http://localhost:8086/businesses/0
 
+status 'DELETE businesses should delete a business by ID'
+curl -X DELETE \
+    http://localhost:8086/businesses/0
+
+status 'DELETE businesses should not delete a business if the ID does not exist'
+curl -X DELETE \
+    http://localhost:8086/businesses/-12312
 
 # status 'GET business-by-id should return failure'
 # curl http://localhost:3000/businesses/9999
