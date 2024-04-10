@@ -20,9 +20,21 @@ curl -X POST \
     http://localhost:8086/businesses
 
 status 'PUT businesses should update a business by ID'
-curl -v -X PUT \
+curl -X PUT \
     -H 'Content-Type: application/json' \
     -d '{"name": "New Business Name", "streetAddress": "123 Address St", "city": "Somewhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
+    http://localhost:8086/businesses/0
+
+status 'PUT businesses should not update a business if the ID does not exist'
+curl -X PUT \
+    -H 'Content-Type: application/json' \
+    -d '{"name": "New Business Name", "streetAddress": "123 Address St", "city": "Somewhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
+    http://localhost:8086/businesses/-123122312
+
+status 'PUT businesses should not update a business if necessary fields are missing'
+curl -X PUT \
+    -H 'Content-Type: application/json' \
+    -d '{"streetAddress": "123 Address St", "city": "Somewhere", "state": "NW", "zipCode": 12345, "phoneNumber": "555-555-5555", "category": "American", "subcategories": ["burgers"], "website": "www.example.com", "email": "example@example.com"}' \
     http://localhost:8086/businesses/0
 
 status 'DELETE businesses should delete a business by ID'
