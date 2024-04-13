@@ -95,14 +95,29 @@ app.get("", (req, res, next) => {
 })
 
 // Request: POST /reviews - create a review of a business
-app.post("", (req, res, next) => {
-    res.send()
+app.post("/reviews", (req, res) => {
+    if (
+        req.body.hasOwnProperty("businessId") &&
+        req.body.hasOwnProperty("stars") &&
+        req.body.hasOwnProperty("expense")
+    ) {
+        addReview(req.body)
+        console.log(reviews)
+        res.send({
+            "reviewId": reviewId,
+        })
+        reviewId += 1
+    } else {
+        res.status(400).send(
+            "Error 400: Missing necessary fields"
+        )
+    }
 })
 
 // Request: PUT /reviews/{reviewId} - update a review of a business
-app.put("", (req, res, next) => {
-    res.send()
-})
+// app.put("/reviews", (req, res) => {
+//     res.send()
+// })
 
 // Request: GET /reviews - list all of a user's reviews
 app.get("", (req, res) => {
