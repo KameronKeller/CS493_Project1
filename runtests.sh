@@ -32,7 +32,6 @@ curl -s -X POST \
     -d '{"businessId": 2, "photoUrl": "www.com/photo.png", "caption": 1}' \
     http://localhost:8086/photos > /dev/null
 
-# businesses endpoint
 status 'POST businesses should create a business'
 curl -X POST \
     -H 'Content-Type: application/json' \
@@ -71,8 +70,11 @@ status 'DELETE businesses/{businessId} that does not exist returns failure'
 curl -X DELETE \
     http://localhost:8086/businesses/-12312
 
-status 'GET businesses should return all of the businesses'
+status 'GET businesses should return a paginated response of businesses'
 curl http://localhost:8086/businesses/
+
+status 'GET businesses?page=2 should return page 2'
+curl http://localhost:8086/businesses?page=2
 
 status 'GET businesses/{businessId} should return detailed info about that business'
 curl http://localhost:8086/businesses/1
@@ -110,8 +112,11 @@ curl -X PUT \
     -d '{"businessId": 1, "stars": 100, "expense": 1, "review": "not good"}' \
     http://localhost:8086/reviews/123432423
 
-status 'GET reviews returns all of the reviews'
+status 'GET reviews should return a paginated response of reviews'
 curl http://localhost:8086/reviews/
+
+status 'GET reviews?page=2 should return page 2'
+curl http://localhost:8086/reviews?page=2
 
 status 'POST photos adds a photo for a business'
 curl -X POST \
@@ -145,8 +150,11 @@ curl -X PUT \
     -d '{"businessId": 1, "photoUrl": 1, "caption": "New caption"}' \
     http://localhost:8086/photos/11234234234234
 
-status 'GET photos returns all of the photos'
+status 'GET photos should return a paginated response of photos'
 curl http://localhost:8086/photos/
+
+status 'GET photos?page=2 should return page 2'
+curl http://localhost:8086/photos?page=2
 
 status 'GET an endpoint that does not exist returns failure'
 curl http://localhost:8086/notreal

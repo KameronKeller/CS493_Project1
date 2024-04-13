@@ -67,6 +67,42 @@ function hasRequiredPhotoProperties(requestBody) {
   );
 }
 
+function preparePaginatedResponse(req, data, dataName, hateoasUrl) {
+  // Adapted from Exploration 2
+
+  let dataValues = Object.values(data);
+
+  const numPerPage = 1;
+  const lastPage = Math.ceil(dataValues.length / numPerPage);
+
+  let page = parseInt(req.query.page) || 1;
+  page = page < 1 ? 1 : page;
+  page = page > lastPage ? lastPage : page;
+
+  let start = (page - 1) * numPerPage;
+  let end = start + numPerPage;
+  let pageData = dataValues.slice(start, end);
+
+  let links = {};
+  if (page < lastPage) {
+    links.nextPage = `/${hateoasUrl}?page=` + (page + 1);
+    links.lastPage = `/${hateoasUrl}?page=` + lastPage;
+  }
+  if (page > 1) {
+    links.prevPage = `/${hateoasUrl}?page=` + (page - 1);
+    links.firstPage = `/${hateoasUrl}?page=1`;
+  }
+
+  return {
+    pageNumber: page,
+    totalPages: lastPage,
+    pageSize: numPerPage,
+    totalCount: dataValues.length,
+    [dataName]: pageData,
+    links: links,
+  };
+}
+
 app.listen(port, () => {
   on_ready();
 });
@@ -114,7 +150,13 @@ app.delete("/businesses/:businessId", (req, res) => {
 
 // Request: GET /businesses - list all businesses
 app.get("/businesses", (req, res) => {
-  res.send(businesses);
+  response = preparePaginatedResponse(
+    req,
+    businesses,
+    "businesses",
+    "businesses"
+  );
+  res.send(response);
 });
 
 // Request: GET /businesses/{businessId} - list a specific business's details
@@ -160,7 +202,8 @@ app.put("/reviews/:reviewId", (req, res) => {
 
 // Request: GET /reviews - list all of a user's reviews
 app.get("/reviews", (req, res) => {
-  res.send(reviews);
+  response = preparePaginatedResponse(req, reviews, "reviews", "reviews");
+  res.send(response);
 });
 
 // Request: POST /photos - add a photo of a business
@@ -171,7 +214,6 @@ app.post("/photos", (req, res) => {
     res.send({
       photoId: currentphotoId,
     });
-    console.log("== photos", photos);
   } else {
     res.status(400).send("Error 400: Missing necessary fields");
   }
@@ -205,7 +247,8 @@ app.put("/photos/:photoId", (req, res) => {
 
 // Request: GET /photos - retrieve photos a user has uploaded
 app.get("/photos", (req, res) => {
-  res.send(photos);
+  response = preparePaginatedResponse(req, photos, "photos", "photos");
+  res.send(response);
 });
 
 app.use("*", function (req, res) {
