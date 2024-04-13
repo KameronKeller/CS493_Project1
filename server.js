@@ -3,8 +3,7 @@ var express = require("express");
 var app = express();
 app.use(express.json());
 
-// TODO: set this up so that it uses the port environment variable
-var port = 8086;
+const port = process.env.PORT || 8086;
 
 let businesses = {};
 let currentBusinessId = 0;
@@ -32,7 +31,7 @@ function addPhoto(photo) {
 }
 
 function on_ready() {
-  console.log("server ready!");
+  console.log("Server running on port:", port);
 }
 
 function isNotValidId(dataObject, id) {
