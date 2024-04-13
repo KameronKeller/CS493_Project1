@@ -105,27 +105,27 @@ app.put("", (req, res, next) => {
 })
 
 // Request: GET /reviews - list all of a user's reviews
-app.get("", (req, res, next) => {
+app.get("", (req, res) => {
     res.send()
 })
 
 // Request: POST /photos - add a photo of a business
-app.post("", (req, res, next) => {
+app.post("", (req, res) => {
     res.send()
 })
 
 // Request: DELETE /photos/{photoId} - delete a photo
-app.delete("", (req, res, next) => {
+app.delete("", (req, res) => {
     res.send()
 })
 
 // Request: PUT /photos/{photoId} - update a photo caption
-app.put("", (req, res, next) => {
+app.put("", (req, res) => {
     res.send()
 })
 
 // Request: GET /photos - retrieve photos a user has uploaded
-app.get("", (req, res, next) => {
+app.get("", (req, res) => {
     res.send()
 })
 
