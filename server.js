@@ -7,7 +7,17 @@ app.use(express.json());
 var port = 8086;
 
 let businesses = []
+let reviews = {}
+let reviewId = 0
 
+function addReview(review) {
+    console.log("== review", review);
+    if (review.businessId in reviews) {
+        reviews.businessId.push(review)
+    } else {
+        reviews.businessId = [review]
+    }
+}
 
 function on_ready() {
     console.log("server ready!");
@@ -20,14 +30,14 @@ app.listen(port, () => {
 // Request: POST /businesses - create a business
 app.post("/businesses", (req, res) => {
     if (
-        req.body.name &&
-        req.body.streetAddress &&
-        req.body.city &&
-        req.body.state &&
-        req.body.zipCode &&
-        req.body.phoneNumber &&
-        req.body.category &&
-        req.body.subcategories
+        req.body.hasOwnProperty("name") &&
+        req.body.hasOwnProperty("streetAddress") &&
+        req.body.hasOwnProperty("city") &&
+        req.body.hasOwnProperty("state") &&
+        req.body.hasOwnProperty("zipCode") &&
+        req.body.hasOwnProperty("phoneNumber") &&
+        req.body.hasOwnProperty("category") &&
+        req.body.hasOwnProperty("subcategories")
     ) {
         const index = businesses.length
         businesses.push(req.body)
@@ -50,14 +60,14 @@ app.put("/businesses/:businessId", (req, res) => {
             "Error 400: Specified resource does not exist"
         )
     } else if (
-        req.body.name &&
-        req.body.streetAddress &&
-        req.body.city &&
-        req.body.state &&
-        req.body.zipCode &&
-        req.body.phoneNumber &&
-        req.body.category &&
-        req.body.subcategories
+        req.body.hasOwnProperty("name") &&
+        req.body.hasOwnProperty("streetAddress") &&
+        req.body.hasOwnProperty("city") &&
+        req.body.hasOwnProperty("state") &&
+        req.body.hasOwnProperty("zipCode") &&
+        req.body.hasOwnProperty("phoneNumber") &&
+        req.body.hasOwnProperty("category") &&
+        req.body.hasOwnProperty("subcategories")
     ) {
         businesses[businessId] = req.body
         res.send({
@@ -85,12 +95,17 @@ app.delete("/businesses/:businessId", (req, res) => {
 })
 
 // Request: GET /businesses - list all businesses
-app.get("", (req, res, next) => {
-    res.send()
+app.get("/businesses", (req, res) => {
+    res.send(businesses)
 })
 
-// Request: GET /businesses/{id} - list a specific business's details
-app.get("", (req, res, next) => {
+// Request: GET /businesses/{businessId} - list a specific business's details
+app.get("/businesses/:businessId", (req, res) => {
+    const businessId = req.params.businessId
+    let business = businesses[businessId]
+    console.log("== reviews.businessId", reviews.businessId);
+    business.reviews = reviews.businessId
+    console.log("== business", business);
     res.send()
 })
 
