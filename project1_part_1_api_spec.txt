@@ -15,7 +15,7 @@
 			}
 		Response body:
 			{
-				"businessId": string,
+				"businessId": number,
 				"businessHref": /businesses/{id}
 			}
 
@@ -36,7 +36,7 @@
 			}
 		Response body:
 			{
-				"businessId": string,
+				"businessId": number,
 				"businessHref": /businesses/{id}
 			}
 
@@ -49,7 +49,7 @@
 		Response body:
 			[
 				{
-					"businessId": string,
+					"businessId": number,
 					"businessHref": /businesses/{id},
 					"name": string,
 				    "streetAddress": string,
@@ -68,7 +68,7 @@
 		Request body: -
 		Response body:
 			{
-				"businessId": string,
+				"businessId": number,
 				"businessHref": /businesses/{id},
 				"name": string,
 				"streetAddress": string,
@@ -82,6 +82,7 @@
 				"email": string (optional)
 				"reviews": [
 					{
+						"businessId": number,
 						"reviewId": string,
 						"stars": number,
 						"expense": number,
@@ -95,7 +96,7 @@
 	Request: POST /reviews - create a review of a business
 		Request body:
 			{
-				"businessId": string,
+				"businessId": number,
 				"stars": number,
 				"expense": number,
 				"review": string (optional)
@@ -137,7 +138,7 @@
 			--<boundaryIdentifier>
 			Content-Type: application/json
 			{
-				"businessId": string,
+				"businessId": number,
 				"caption": string (optional)
 			}
 
