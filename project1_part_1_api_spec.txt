@@ -109,6 +109,7 @@
 	Request: PUT /reviews/{reviewId} - update a review of a business
 		Request body:
 			{
+				"businessId": number,
 				"stars": number,
 				"expense": number,
 				"review": string (optional)
@@ -131,20 +132,12 @@
 			]
 
 	Request: POST /photos - add a photo of a business
-		// Source for this endpoint: https://stackoverflow.com/a/37394437/7100879
-		// I'm not sure how this will work with parsing this request in Express
-		Content-Type: multipart/related; boundary=<boundaryIdentifier>
-		Request body:
-			--<boundaryIdentifier>
 			Content-Type: application/json
 			{
 				"businessId": number,
+				"photoUrl": string,
 				"caption": string (optional)
 			}
-
-			--<boundaryIdentifier>
-			Content-Type: image/jpeg
-			[image data]
 		Response body:
 			{
 				"photoId": string
