@@ -1,32 +1,33 @@
 var express = require("express");
 
-var app = express();
-app.use(express.json());
-
-const port = process.env.PORT || 8086;
-
-let businesses = {};
-let currentBusinessId = 0;
-let reviews = {};
-let reviewId = 0;
-let photos = {};
-let currentphotoId = 0;
+function getBusinessIdFromCompoundKey(key) {
+  // match on b or (r or p)
+  return key.split(/[b|(r|p)]/)[1];
+}
 
 function addReview(review) {
+  currentReviewId++;
   let businessId = review.businessId;
-  if (businessId in reviews) {
-    reviews[businessId].push(review);
+  const reviewId = `b${businessId}r${currentReviewId}`;
+  if (!reviews[businessId]) {
+    reviews[businessId] = {
+      [reviewId]: review,
+    };
   } else {
-    reviews[businessId] = [review];
+    reviews[businessId][reviewId] = review;
   }
 }
 
 function addPhoto(photo) {
+  currentphotoId++;
   let businessId = photo.businessId;
-  if (businessId in photos) {
-    photos[businessId].push(photo);
+  const photoId = `b${businessId}p${currentphotoId}`;
+  if (!photos[businessId]) {
+    photos[businessId] = {
+      [photoId]: photo,
+    };
   } else {
-    photos[businessId] = [photo];
+    photos[businessId][photoId] = photo;
   }
 }
 
@@ -102,8 +103,27 @@ function preparePaginatedResponse(req, data, dataName, hateoasUrl) {
   };
 }
 
+var app = express();
+app.use(express.json());
+
+const port = process.env.PORT || 8086;
+
+let businesses = {};
+let currentBusinessId = 0;
+let reviews = {};
+let currentReviewId = 0;
+let photos = {};
+let currentphotoId = 0;
+
 app.listen(port, () => {
   on_ready();
+});
+
+app.use(function (req, res, next) {
+  console.log("== Request received");
+  console.log("  - Method:", req.method);
+  console.log("  - URL:", req.url);
+  next();
 });
 
 // Request: POST /businesses - create a business
@@ -149,7 +169,7 @@ app.delete("/businesses/:businessId", (req, res) => {
 
 // Request: GET /businesses - list all businesses
 app.get("/businesses", (req, res) => {
-  response = preparePaginatedResponse(
+  const response = preparePaginatedResponse(
     req,
     businesses,
     "businesses",
@@ -174,10 +194,9 @@ app.get("/businesses/:businessId", (req, res) => {
 // Request: POST /reviews - create a review of a business
 app.post("/reviews", (req, res) => {
   if (hasRequiredReviewProperties(req.body)) {
-    reviewId++;
     addReview(req.body);
     res.send({
-      reviewId: reviewId,
+      reviewId: currentReviewId,
     });
   } else {
     res.status(400).send("Error 400: Missing necessary fields");
@@ -186,11 +205,14 @@ app.post("/reviews", (req, res) => {
 
 // Request: PUT /reviews/{reviewId} - update a review of a business
 app.put("/reviews/:reviewId", (req, res) => {
+  const review = req.body;
   const reviewId = req.params.reviewId;
-  if (isNotValidId(reviews, reviewId)) {
+  const businessId = review.businessId;
+
+  if (!businessId || isNotValidId(reviews[businessId], reviewId)) {
     res.status(400).send("Error 400: Specified resource does not exist");
   } else if (hasRequiredReviewProperties(req.body)) {
-    reviews[reviewId] = req.body;
+    reviews[businessId][reviewId] = review;
     res.send({
       reviewId: reviewId,
     });
@@ -199,16 +221,36 @@ app.put("/reviews/:reviewId", (req, res) => {
   }
 });
 
+// Request: DELETE /reviews/{reviewId} - deletes a review of a business
+app.delete("/reviews/:reviewId", (req, res) => {
+  const reviewId = req.params.reviewId;
+  const businessId = getBusinessIdFromCompoundKey(reviewId);
+  if (!businessId || isNotValidId(reviews[businessId], reviewId)) {
+    res.status(400).send("Error 400: Specified resource does not exist");
+  } else {
+    delete reviews[businessId].reviewId;
+    res.sendStatus(200);
+  }
+});
+
 // Request: GET /reviews - list all of a user's reviews
 app.get("/reviews", (req, res) => {
-  response = preparePaginatedResponse(req, reviews, "reviews", "reviews");
+  // Convert a list of review objects
+  // to a single object containing all of the reviews
+  let condensedReviews = Object.assign({}, ...Object.values(reviews));
+
+  const response = preparePaginatedResponse(
+    req,
+    condensedReviews,
+    "reviews",
+    "reviews"
+  );
   res.send(response);
 });
 
 // Request: POST /photos - add a photo of a business
 app.post("/photos", (req, res) => {
   if (hasRequiredPhotoProperties(req.body)) {
-    currentphotoId++;
     addPhoto(req.body);
     res.send({
       photoId: currentphotoId,
@@ -221,21 +263,25 @@ app.post("/photos", (req, res) => {
 // Request: DELETE /photos/{photoId} - delete a photo
 app.delete("/photos/:photoId", (req, res) => {
   const photoId = req.params.photoId;
-  if (isNotValidId(photos, photoId)) {
+  const businessId = getBusinessIdFromCompoundKey(photoId);
+  if (!businessId || isNotValidId(photos[businessId], photoId)) {
     res.status(400).send("Error 400: Specified resource does not exist");
   } else {
-    delete photos.photoId;
+    delete photos[businessId].photoId;
     res.sendStatus(200);
   }
 });
 
 // Request: PUT /photos/{photoId} - update a photo caption
 app.put("/photos/:photoId", (req, res) => {
+  const photo = req.body;
   const photoId = req.params.photoId;
-  if (isNotValidId(photos, photoId)) {
+  const businessId = photo.businessId;
+
+  if (!businessId || isNotValidId(photos[businessId], photoId)) {
     res.status(400).send("Error 400: Specified resource does not exist");
-  } else if (hasRequiredPhotoProperties(req.body)) {
-    photos[photoId] = req.body;
+  } else if (hasRequiredPhotoProperties(photo)) {
+    photos[businessId][photoId] = photo;
     res.send({
       photoId: photoId,
     });
@@ -246,7 +292,15 @@ app.put("/photos/:photoId", (req, res) => {
 
 // Request: GET /photos - retrieve photos a user has uploaded
 app.get("/photos", (req, res) => {
-  response = preparePaginatedResponse(req, photos, "photos", "photos");
+  // Convert a list of review objects
+  // to a single object containing all of the reviews
+  let condensedPhotos = Object.assign({}, ...Object.values(photos));
+  const response = preparePaginatedResponse(
+    req,
+    condensedPhotos,
+    "photos",
+    "photos"
+  );
   res.send(response);
 });
 
