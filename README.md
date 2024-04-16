@@ -19,3 +19,17 @@ example
 ```bash
 PORT=7813 ./runtests.sh
 ```
+
+# Run with Docker
+
+Build:
+
+```bash
+docker build -t project1_server .
+```
+
+Run:
+
+```bash
+docker run -it -p 8086:8086 project1_server
+```
