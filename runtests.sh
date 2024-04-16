@@ -27,16 +27,26 @@ curl -s -X POST \
     http://localhost:$PORT/reviews > /dev/null
 curl -s -X POST \
     -H 'Content-Type: application/json' \
+    -d '{"businessId": 1, "stars": 3, "expense": 12, "review": "rly good"}' \
+    http://localhost:$PORT/reviews > /dev/null
+curl -s -X POST \
+    -H 'Content-Type: application/json' \
     -d '{"businessId": 2, "stars": 4, "expense": 1, "review": "very good"}' \
     http://localhost:$PORT/reviews > /dev/null
 curl -s -X POST \
     -H 'Content-Type: application/json' \
-    -d '{"businessId": 1, "photoUrl": "www.com/photo.png", "caption": 1}' \
+    -d '{"businessId": 1, "photoUrl": "www.com/photo1.png", "caption": "the dessert"}' \
+    http://localhost:$PORT/photos > /dev/null
+curl -s -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"businessId": 1, "photoUrl": "www.com/photo2.png", "caption": "the meal"}' \
     http://localhost:$PORT/photos > /dev/null
 curl -s -X POST \
     -H 'Content-Type: application/json' \
     -d '{"businessId": 2, "photoUrl": "www.com/photo.png", "caption": 1}' \
     http://localhost:$PORT/photos > /dev/null
+
+# Run tests
 
 status 'POST businesses should create a business'
 curl -X POST \
@@ -103,20 +113,28 @@ curl -X POST \
 status 'PUT reviews/{reviewId} should update a review'
 curl -X PUT \
     -H 'Content-Type: application/json' \
-    -d '{"businessId": 1, "stars": 100, "expense": 1, "review": "not good"}' \
-    http://localhost:$PORT/reviews/1
+    -d '{"businessId": 1, "stars": 143, "expense": 1, "review": "amazing"}' \
+    http://localhost:$PORT/reviews/b1r1
 
 status 'PUT reviews/{reviewId} should fail if necessary fields are not included'
 curl -X PUT \
     -H 'Content-Type: application/json' \
     -d '{"stars": 100, "expense": 1, "review": "not good"}' \
-    http://localhost:$PORT/reviews/1
+    http://localhost:$PORT/reviews/b1r1
 
 status 'PUT reviews/{reviewId} that does not exist returns failure'
 curl -X PUT \
     -H 'Content-Type: application/json' \
     -d '{"businessId": 1, "stars": 100, "expense": 1, "review": "not good"}' \
     http://localhost:$PORT/reviews/123432423
+
+status 'DELETE reviews/{reviewId} should delete the review'
+curl -X DELETE \
+    http://localhost:$PORT/reviews/b1r1
+
+status 'DELETE reviews/{reviewId} that does not exist returns failure'
+curl -X DELETE \
+    http://localhost:$PORT/reviews/12342423423423
 
 status 'GET reviews should return a paginated response of reviews'
 curl http://localhost:$PORT/reviews/
@@ -132,7 +150,7 @@ curl -X POST \
 
 status 'DELETE photos/{photoId} should delete the photo'
 curl -X DELETE \
-    http://localhost:$PORT/photos/1
+    http://localhost:$PORT/photos/b1p1
 
 status 'DELETE photos/{photoId} that does not exist returns failure'
 curl -X DELETE \
@@ -142,13 +160,13 @@ status 'PUT photos/{photoId} updates a photo for a business'
 curl -X PUT \
     -H 'Content-Type: application/json' \
     -d '{"businessId": 1, "photoUrl": 1, "caption": "New caption"}' \
-    http://localhost:$PORT/photos/1
+    http://localhost:$PORT/photos/b1p1
 
 status 'PUT photos/{photoId} should fail if necessary fields are not included'
 curl -X PUT \
     -H 'Content-Type: application/json' \
     -d '{"photoUrl": 1, "caption": "New caption"}' \
-    http://localhost:$PORT/photos/1
+    http://localhost:$PORT/photos/b1p1
 
 status 'PUT photos/{photoId} that does not exist returns failure'
 curl -X PUT \
