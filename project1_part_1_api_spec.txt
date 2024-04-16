@@ -119,6 +119,10 @@
 				"reviewId": string
 			}
 
+	Request: DELETE /reviews/{reviewId} - delete a photo
+		Request body: -
+		Response body: -
+
 	Request: GET /reviews - list all of a user's reviews
 		Request body: -
 		Response body:
